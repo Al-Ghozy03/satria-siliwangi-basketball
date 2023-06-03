@@ -1,6 +1,16 @@
+"use client";
+import { useEffect } from "react";
 import SideBar from "./sidebar";
 
 export default function Layout({ children, name }) {
+  useEffect(() => {
+    document.title = `${name} - Satria Siliwangi Basketball`;
+    const abortController = new AbortController();
+    return () => {
+      abortController.abort();
+    };
+  }, []);
+
   return (
     <main className="flex">
       <SideBar />
