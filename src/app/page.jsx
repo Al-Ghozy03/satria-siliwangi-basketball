@@ -62,7 +62,7 @@ export default function Home() {
   );
 
   return (
-    <Layout name={"dashboard"}>
+    <Layout name={"Dashboard"}>
       {/* info */}
       <div className="grid grid-cols-3 gap-x-5">
         <CardInfo
