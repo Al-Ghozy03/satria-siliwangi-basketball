@@ -4,33 +4,41 @@ import { Menu, Transition } from "@headlessui/react";
 import { ArrowDown2 } from "iconsax-react";
 import { Fragment } from "react";
 
-export default function Siswa() {
+export default function DetailOrangTua() {
   return (
-    <Layout name={"Siswa"}>
+    <Layout name={"Orang Tua"}>
+      <div className="flex space-x-5">
+        <Info title={"Nama Ayah"} value={"John Doe"} />
+        <Info title={"Nama Ibu"} value={"Jane Doe"} />
+      </div>
+      <Info title={"Nama Siswa"} value={"Jane Doe"} />
+      <Info title={"Alamat"} value={"Cempaka Putih, Jakarta"} />
+      <Info title={"Tanggal Pembayaran"} value={"20 Juni 2023"} />
+      {/*  */}
+      <h3 className="text-gray-500 text-sm mt-2">Iuran Bulanan</h3>
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg">
-        <table className="w-full">
+        <table>
           <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
             <tr>
-              <th className="font-semibold text-[#969696] text-sm">No</th>
-              <th className="font-semibold text-[#969696] text-sm text-left">
-                Nama
+              <th className="font-semibold text-[#969696] text-sm text-left w-1/4">
+                Bulan
               </th>
               <th className="font-semibold text-[#969696] text-sm text-left">
-                NIS
+                Status Pembayaran
               </th>
-              <th className="font-semibold text-[#969696] text-sm text-left">
-                Kelompok Umur
-              </th>
-              <th className="font-semibold text-[#969696] text-sm text-left">
+              <th className="font-semibold text-[#969696] text-sm text-left w-1/4">
                 Action
               </th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td className="text-sm text-center">1</td>
-              <td className="text-sm">Muhammad Faiz Al Ghozi</td>
-              <td className="text-sm">87818197732</td>
+              <td className="text-sm">Januari</td>
+              <td className="text-sm">
+                <div className="bg-red-500 text-white text-center text-xs rounded-lg py-1.5 w-32">
+                  Belum Terbayar
+                </div>
+              </td>
               <td className="text-sm">
                 <Menu
                   as="div"
@@ -62,7 +70,20 @@ export default function Siswa() {
                                   : "text-gray-900"
                               } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
                             >
-                              Lunas
+                              Terbayar
+                            </button>
+                          )}
+                        </Menu.Item>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <button
+                              className={`${
+                                active
+                                  ? "bg-violet-500 text-white"
+                                  : "text-gray-900"
+                              } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
+                            >
+                              Belum Terbayar
                             </button>
                           )}
                         </Menu.Item>
@@ -71,20 +92,19 @@ export default function Siswa() {
                   </Transition>
                 </Menu>
               </td>
-              <td className="text-sm">
-                <div className="flex space-x-3">
-                  <button className="bg-blue-500 rounded-md p-1 text-white text-xs">
-                    {/* <Edit className="h-4 w-4" /> */}Edit
-                  </button>
-                  <button className="bg-red-500 rounded-md p-1 text-white text-xs">
-                    {/* <Trash className="h-4 w-4" /> */} Hapus
-                  </button>
-                </div>
-              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </Layout>
+  );
+}
+
+function Info({ title, value }) {
+  return (
+    <div className="mt-2">
+      <h3 className="text-gray-500 text-sm">{title}</h3>
+      <p className="font-medium">{value}</p>
+    </div>
   );
 }
