@@ -26,7 +26,7 @@ export default function Layout({ children, name, extra }) {
             {name}
           </h1>
           <div className="flex items-center">
-            {extra}
+            <div>{extra}</div>
             <button
               onClick={() => setOpen(!open)}
               className="hover:bg-gray-200 p-2 rounded-full lg:hidden"
