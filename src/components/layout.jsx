@@ -2,9 +2,11 @@
 import { useEffect, useState } from "react";
 import SideBar from "./sidebar";
 import { HambergerMenu } from "iconsax-react";
+import { useRouter } from "next/navigation";
 
 export default function Layout({ children, name }) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     document.title = `${name} - Satria Siliwangi Basketball`;
     const abortController = new AbortController();
@@ -12,13 +14,15 @@ export default function Layout({ children, name }) {
       abortController.abort();
     };
   }, []);
-
+  if (!localStorage.getItem("token")) return router.push("/login");
   return (
     <main className="flex">
       <SideBar open={open} setOpen={setOpen} />
       <section className="lg:pr-6 lg:pl-[22rem] lg:px-10 px-5 w-full py-3 lg:py-0">
         <div className="flex justify-between bg-[#F5F4F7] bg-opacity-20 backdrop-blur-lg fixed w-[88%] lg:w-[55rem] py-5 px-3 rounded-xl items-center">
-          <h1 className="font-semibold capitalize lg:text-4xl text-2xl">{name}</h1>
+          <h1 className="font-semibold capitalize lg:text-4xl text-2xl">
+            {name}
+          </h1>
           <button
             onClick={() => setOpen(!open)}
             className="hover:bg-gray-200 p-2 rounded-full"
