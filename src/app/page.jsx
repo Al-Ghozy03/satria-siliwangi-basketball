@@ -12,21 +12,21 @@ import dynamic from "next/dynamic";
 import { Fragment, useState } from "react";
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
+export const months = [
+  "Januari",
+  "Februari",
+  "Maret",
+  "April",
+  "Mei",
+  "Juni",
+  "Juli",
+  "Agustus",
+  "September",
+  "Oktober",
+  "November",
+  "Desember",
+];
 export default function Home() {
-  const months = [
-    "Januari",
-    "Februari",
-    "Maret",
-    "April",
-    "Mei",
-    "Juni",
-    "Juli",
-    "Agustus",
-    "September",
-    "Oktober",
-    "November",
-    "Desember",
-  ];
   const series = [
     {
       name: "Hadir",
