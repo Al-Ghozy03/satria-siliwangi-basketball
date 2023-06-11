@@ -1,5 +1,5 @@
 "use client";
-import { Add, ClipboardText, Home2, People, Profile } from "iconsax-react";
+import { Add, ClipboardText, Home2, Moneys, People, Profile } from "iconsax-react";
 import Image from "next/image";
 import logo from "../assets/SS-LOGO.png";
 import Link from "next/link";
@@ -28,6 +28,7 @@ export default function SideBar({ open,setOpen }) {
       <Menu title={"orang tua"} route={"/orang-tua"} Icon={People} />
       <Menu title={"siswa"} route={"/siswa"} Icon={Profile} />
       <Menu title={"absensi"} route={"/absensi"} Icon={ClipboardText} />
+      <Menu title={"iuran bulanan"} route={"/iuran-bulanan"} Icon={Moneys} />
     </nav>
   );
 }

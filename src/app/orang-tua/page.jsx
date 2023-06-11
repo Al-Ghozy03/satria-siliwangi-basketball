@@ -9,15 +9,15 @@ export default function OrangTua() {
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getData = async () => {
     try {
-      setData({ ...data, loading: true });
+      setData({ error: false, loading: true, data: [] });
       const res = await api_service.get("/orangtua");
-      console.log(res);
+      setData({ error: false, loading: false, data: res.data });
     } catch (er) {
       console.log(er);
-      setData({ ...data, error: true });
+      setData({ error: true, loading: false, data: [] });
     }
   };
-
+  console.log(data);
   useEffect(() => {
     getData();
   }, []);
@@ -31,10 +31,19 @@ export default function OrangTua() {
                 No
               </th>
               <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-auto">
-                Nama
+                Nama Ayah
               </th>
               <th className="font-semibold text-[#969696] text-sm text-left w-96 lg:w-auto">
-                WhatsApp
+                No Hp Ayah
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-auto">
+                Nama Ibu
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left w-96 lg:w-auto">
+                No Hp Ibu
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left w-96 lg:w-auto">
+                Alamat
               </th>
               <th className="font-semibold text-[#969696] text-sm text-center lg:text-left w-96 lg:w-auto">
                 Action
@@ -42,24 +51,33 @@ export default function OrangTua() {
             </tr>
           </thead>
           <tbody>
-            <tr>
-              <td className="text-sm text-center">1</td>
-              <td className="text-sm">Muhammad Faiz Al Ghozi</td>
-              <td className="text-sm">+62 878 1819 7732</td>
-              <td className="text-sm">
-                <div className="flex space-x-3">
-                  <Link
-                    href={"/orang-tua/2"}
-                    className="bg-blue-500 rounded-md p-1 text-white text-xs"
-                  >
-                    {/* <Edit className="h-4 w-4" /> */}Detail
-                  </Link>
-                  <button className="bg-red-500 rounded-md p-1 text-white text-xs">
-                    {/* <Trash className="h-4 w-4" /> */} Hapus
-                  </button>
-                </div>
-              </td>
-            </tr>
+            {data.loading
+              ? "Loading..."
+              : data.data.length === 0
+              ? "Empty"
+              : data.data?.map((data, i) => (
+                  <tr key={i}>
+                    <td className="text-sm text-center">{i + 1}</td>
+                    <td className="text-sm">{data.nama_ayah}</td>
+                    <td className="text-sm">{data.no_telepon_ayah}</td>
+                    <td className="text-sm">{data.nama_ibu}</td>
+                    <td className="text-sm">{data.no_telepon_ibu}</td>
+                    <td className="text-sm">{data.alamat}</td>
+                    <td className="text-sm">
+                      <div className="flex space-x-3">
+                        <Link
+                          href={`/orang-tua/${data.id}`}
+                          className="bg-blue-500 rounded-md p-1 text-white text-xs"
+                        >
+                          {/* <Edit className="h-4 w-4" /> */}Detail
+                        </Link>
+                        <button className="bg-red-500 rounded-md p-1 text-white text-xs">
+                          {/* <Trash className="h-4 w-4" /> */} Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>

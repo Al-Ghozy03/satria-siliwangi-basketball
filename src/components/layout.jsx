@@ -4,7 +4,7 @@ import SideBar from "./sidebar";
 import { HambergerMenu } from "iconsax-react";
 import { useRouter } from "next/navigation";
 
-export default function Layout({ children, name }) {
+export default function Layout({ children, name, extra }) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   useEffect(() => {
@@ -14,7 +14,9 @@ export default function Layout({ children, name }) {
       abortController.abort();
     };
   }, []);
-  if (!localStorage.getItem("token")) return router.push("/login");
+  if (typeof window !== "undefined") {
+    if (!localStorage.getItem("token")) return router.replace("/login");
+  }
   return (
     <main className="flex">
       <SideBar open={open} setOpen={setOpen} />
@@ -23,12 +25,15 @@ export default function Layout({ children, name }) {
           <h1 className="font-semibold capitalize lg:text-4xl text-2xl">
             {name}
           </h1>
-          <button
-            onClick={() => setOpen(!open)}
-            className="hover:bg-gray-200 p-2 rounded-full"
-          >
-            <HambergerMenu size={20} />
-          </button>
+          <div className="flex items-center">
+            {extra}
+            <button
+              onClick={() => setOpen(!open)}
+              className="hover:bg-gray-200 p-2 rounded-full lg:hidden"
+            >
+              <HambergerMenu size={20} />
+            </button>
+          </div>
         </div>
         <div className="lg:py-20 py-24 w-full">{children}</div>
       </section>

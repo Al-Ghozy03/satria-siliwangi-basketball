@@ -21,6 +21,14 @@ class ApiService {
         .catch((er) => reject(er.response.data));
     });
   }
+  put(endpoint, data) {
+    return new Promise((resolve, reject) => {
+      axios
+        .put(`${this.baseUrl}${endpoint}`, data, { headers: this.headers })
+        .then((v) => resolve(v.data))
+        .catch((er) => reject(er.response.data));
+    });
+  }
 }
 
 export default new ApiService();
