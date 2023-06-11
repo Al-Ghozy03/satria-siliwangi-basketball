@@ -29,6 +29,14 @@ class ApiService {
         .catch((er) => reject(er.response.data));
     });
   }
+  delete(endpoint) {
+    return new Promise((resolve, reject) => {
+      axios
+        .delete(`${this.baseUrl}${endpoint}`, { headers: this.headers })
+        .then((v) => resolve(v.data))
+        .catch((er) => reject(er.response.data));
+    });
+  }
 }
 
 export default new ApiService();
