@@ -5,6 +5,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { Icon } from "@iconify/react";
 import { Dialog, Transition } from "@headlessui/react";
 import { months } from "../page";
+import ReactPaginate from "react-paginate";
 
 export default function Siswa() {
   const [data, setData] = useState({
@@ -12,7 +13,6 @@ export default function Siswa() {
     error: false,
     data: [],
     total: 0,
-    total_page: 0,
     current_page: 0,
   });
   const options = ["KU 10 MIX", "KU 12", "KU 14", "KU 16", "Senior"];
@@ -20,22 +20,39 @@ export default function Siswa() {
   const [selected, setSelected] = useState(null);
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [totalPage, setTotalPage] = useState(0);
 
   const getData = async (page) => {
     try {
-      setData({ loading: true, error: false, data: [] });
+      setData({
+        loading: true,
+        error: false,
+        data: [],
+        total: data.total,
+        current_page: data.current_page,
+      });
       const res = await api_service.get(`/siswa?page=${page}&limit=10`);
       setData({
         loading: false,
         error: false,
         data: res.data,
         total: res.total,
-        total_page: res.total_page,
         current_page: page,
       });
+      setTotalPage(res.total_page);
     } catch (er) {
-      setData({ loading: false, error: true, data: [] });
+      setData({
+        loading: false,
+        error: true,
+        data: [],
+        total: data.total,
+        current_page: data.current_page,
+      });
     }
+  };
+
+  const onPageChange = ({ selected }) => {
+    setPage(selected + 1);
   };
 
   useEffect(() => {
@@ -64,7 +81,7 @@ export default function Siswa() {
               <tr>
                 <th className="font-semibold text-[#969696] text-sm ">No</th>
                 <th className="font-semibold text-[#969696] text-sm w-60 text-left">
-                  Nama {page} {page === data.total_page}
+                  Nama
                 </th>
                 <th className="font-semibold text-[#969696] text-sm text-left">
                   NIS
@@ -81,8 +98,8 @@ export default function Siswa() {
               {data.data?.map((data, i) => (
                 <tr key={i}>
                   <td className="text-sm text-center">{i + 1}</td>
-                  <td className="text-sm">{data.nama}</td>
-                  <td className="text-sm">{data.no_induk_ss}</td>
+                  <td className="text-sm">{data.nama ? data.nama : "-"}</td>
+                  <td className="text-sm">{data.no_induk_ss? data.no_induk_ss : "-"}</td>
                   <td className="text-sm">
                     <select
                       defaultValue={data.ku_genap}
@@ -122,31 +139,30 @@ export default function Siswa() {
             </tbody>
           </table>
         )}
-        {/* {!data.loading && (
-          <div className="flex justify-end mt-5 text-xs space-x-3">
-            <button className="bg-orange-100 px-3 py-1.5 text-orange-500 font-semibold rounded-md shadow-lg">
-              Prev
-            </button>
-            <button className="bg-orange-400 px-3 py-1.5 text-white rounded-md shadow-lg">
-              1
-            </button>
-            <button className="bg-orange-400 px-3 py-1.5 text-white rounded-md shadow-lg">
-              2
-            </button>
-            <button className="bg-orange-400 px-3 py-1.5 text-white rounded-md shadow-lg">
-              2
-            </button>
-            <button className="bg-orange-400 px-3 py-1.5 text-white rounded-md shadow-lg">
-              3
-            </button>
-            <button className="bg-orange-400 px-3 py-1.5 text-white rounded-md shadow-lg">
-              4
-            </button>
-            <button className="bg-orange-100 px-3 py-1.5 text-orange-500 font-semibold rounded-md shadow-lg">
-              Next
-            </button>
-          </div>
-        )} */}
+        <ReactPaginate
+          containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
+          breakLabel="..."
+          activeClassName="bg-orange-500 shadow-lg text-white"
+          pageClassName="border border-orange-300 px-3 py-1.5 rounded-md"
+          nextLabel={
+            page !== totalPage && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Next
+              </button>
+            )
+          }
+          onPageChange={onPageChange}
+          pageRangeDisplayed={3}
+          pageCount={totalPage}
+          previousLabel={
+            page !== 1 && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Prev
+              </button>
+            )
+          }
+          renderOnZeroPageCount={null}
+        />
       </div>
     </Layout>
   );
