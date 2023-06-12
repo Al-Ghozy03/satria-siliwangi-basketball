@@ -7,6 +7,7 @@ import { Edit, Trash } from "iconsax-react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 
 const schema = yup
@@ -23,20 +24,49 @@ export default function OrangTua() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenCreate, setIsOpenCreate] = useState(false);
   const [selected, setSelected] = useState(null);
-  const [data, setData] = useState({ loading: false, error: false, data: [] });
+  const [data, setData] = useState({
+    loading: false,
+    error: false,
+    data: [],
+    total: 0,
+    total_page: 0,
+    current_page: 1,
+  });
+  const [page, setPage] = useState(1);
   const getData = async () => {
     try {
-      setData({ error: false, loading: true, data: [] });
-      const res = await api_service.get("/orangtua");
-      setData({ error: false, loading: false, data: res.data });
+      setData({
+        error: false,
+        loading: true,
+        data: [],
+        total: data.total,
+        total_page: data.total_page,
+        current_page: data.current_page,
+      });
+      const res = await api_service.get(`/orangtua?limit=15&page=${page}`);
+      setData({
+        error: false,
+        loading: false,
+        data: res.data,
+        total: res.total,
+        total_page: res.total_page,
+        current_page: res.current_page,
+      });
     } catch (er) {
       console.log(er);
-      setData({ error: true, loading: false, data: [] });
+      setData({
+        error: true,
+        loading: false,
+        data: [],
+        total: data.total,
+        total_page: data.total_page,
+        current_page: data.current_page,
+      });
     }
   };
   useEffect(() => {
     getData();
-  }, []);
+  }, [page]);
   return (
     <Layout
       name={"Orang tua"}
@@ -45,22 +75,22 @@ export default function OrangTua() {
           onClick={() => setIsOpenCreate(true)}
           className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
         >
-          Edit
+          Add
         </button>
       }
     >
+      <ModalCreate
+        isOpen={isOpenCreate}
+        setIsOpen={setIsOpenCreate}
+        getData={getData}
+      />
+      <ModalDelete
+        isOpen={isOpenDelete}
+        setIsOpen={setIsOpenDelete}
+        data={selected}
+        getData={getData}
+      />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto">
-        <ModalCreate
-          isOpen={isOpenCreate}
-          setIsOpen={setIsOpenCreate}
-          getData={getData}
-        />
-        <ModalDelete
-          isOpen={isOpenDelete}
-          setIsOpen={setIsOpenDelete}
-          data={selected}
-          getData={getData}
-        />
         <table className="w-full">
           <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
             <tr>
@@ -76,11 +106,8 @@ export default function OrangTua() {
               <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-auto">
                 Nama Ibu
               </th>
-              <th className="font-semibold text-[#969696] text-sm text-left w-96 lg:w-auto">
+              <th className="font-semibold text-[#969696] text-sm text-left w-[96] lg:w-auto">
                 No Hp Ibu
-              </th>
-              <th className="font-semibold text-[#969696] text-sm text-left w-96 lg:w-auto">
-                Alamat
               </th>
               <th className="font-semibold text-[#969696] text-sm text-center lg:text-left w-96 lg:w-auto">
                 Action
@@ -95,11 +122,18 @@ export default function OrangTua() {
               : data.data?.map((data, i) => (
                   <tr key={i}>
                     <td className="text-sm text-center">{i + 1}</td>
-                    <td className="text-sm">{data.nama_ayah}</td>
-                    <td className="text-sm">{data.no_telepon_ayah}</td>
-                    <td className="text-sm">{data.nama_ibu}</td>
-                    <td className="text-sm">{data.no_telepon_ibu}</td>
-                    <td className="text-sm">{data.alamat}</td>
+                    <td className="text-sm">
+                      {data.nama_ayah ? data.nama_ayah : "-"}
+                    </td>
+                    <td className="text-sm">
+                      {data.no_telepon_ayah ? data.no_telepon_ayah : "-"}
+                    </td>
+                    <td className="text-sm">
+                      {data.nama_ibu ? data.nama_ibu : "-"}
+                    </td>
+                    <td className="text-sm">
+                      {data.no_telepon_ibu ? data.no_telepon_ibu : "-"}
+                    </td>
                     <td className="text-sm">
                       <div className="flex space-x-3">
                         <Link
@@ -123,6 +157,30 @@ export default function OrangTua() {
                 ))}
           </tbody>
         </table>
+        <ReactPaginate
+          containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
+          breakLabel="..."
+          activeClassName="bg-orange-500 shadow-lg text-white"
+          pageClassName="border border-orange-300 px-3 py-1.5 rounded-md"
+          nextLabel={
+            page !== data.total_page && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Next
+              </button>
+            )
+          }
+          onPageChange={({ selected }) => setPage(selected + 1)}
+          pageRangeDisplayed={3}
+          pageCount={data.total_page}
+          previousLabel={
+            page !== 1 && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Prev
+              </button>
+            )
+          }
+          renderOnZeroPageCount={null}
+        />
       </div>
     </Layout>
   );
