@@ -20,10 +20,12 @@ const schema = yup
 export default function Absensi() {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
-  const getData = async () => {
+  const options = ["hadir", "tidak hadir"];
+  const [date, setDate] = useState(null);
+  const getData = async (date = null) => {
     try {
       setData({ loading: true, error: false, data: [] });
-      const res = await api_service.get(`/absensi`);
+      const res = await api_service.get(`/absensi?${date && `date=${date}`}`);
       setData({ loading: false, error: false, data: res.data });
     } catch (er) {
       setData({ loading: false, error: true, data: [] });
@@ -31,21 +33,28 @@ export default function Absensi() {
   };
 
   useEffect(() => {
-    getData();
-  }, []);
+    getData(date);
+  }, [date]);
   return (
     <Layout
       name={"Absensi"}
       extra={
-        <button
-          onClick={() => setIsOpen(true)}
-          className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
-        >
-          Tambah
-        </button>
+        <div className="flex space-x-2">
+          <input
+            onChange={(e) => setDate(e.target.value)}
+            type="date"
+            className="outline-none h-9 rounded text-sm border border-gray-300 pl-2 focus:ring-1 focus:ring-orange-400"
+          />
+          <button
+            onClick={() => setIsOpen(true)}
+            className="text-sm bg-[#FFE3B1] px-4 py-2 rounded-md font-semibold text-orange-500"
+          >
+            Tambah
+          </button>
+        </div>
       }
     >
-      <ModalCreate isOpen={isOpen} setIsOpen={setIsOpen} getData={getData} />
+      <ModalCreate isOpen={isOpen} setIsOpen={setIsOpen} getData={getData} date={date} />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto h-full">
         {data.loading ? (
           "loading"
@@ -79,18 +88,21 @@ export default function Absensi() {
                       {date.getDate()} {months[date.getMonth()]}{" "}
                       {date.getFullYear()}
                     </td>
-                    <td className="text-sm">{data.jam}</td>
+                    <td className="text-sm">{data.jam.substring(0, 5)}</td>
                     <td className="text-sm">
                       <select
                         defaultValue={data.status}
-                        className="outline-none w-44 lg:w-3/4 text-sm py-1.5 px-2 rounded-md appearance-none"
+                        className="outline-none capitalize w-44 lg:w-3/4 text-sm py-1.5 px-2 rounded-md appearance-none"
                       >
-                        <option className="text-sm" value="Hadir">
-                          Hadir
-                        </option>
-                        <option className="text-sm" value="Tidak Hadir">
-                          Tidak Hadir
-                        </option>
+                        {options.map((v, j) => (
+                          <option
+                            key={j}
+                            className="text-sm capitalize"
+                            value={v}
+                          >
+                            {v}
+                          </option>
+                        ))}
                       </select>
                     </td>
                   </tr>
@@ -99,12 +111,13 @@ export default function Absensi() {
             </tbody>
           </table>
         )}
+       
       </div>
     </Layout>
   );
 }
 
-function ModalCreate({ isOpen, setIsOpen, getData }) {
+function ModalCreate({ isOpen, setIsOpen, getData,date }) {
   const [selected, setSelected] = useState(null);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getList = async (q = "") => {
@@ -128,7 +141,7 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
         ...data,
         id_siswa: selected.id,
       });
-      getData();
+      getData(date);
       reset();
       setIsOpen(false);
     } catch (er) {
