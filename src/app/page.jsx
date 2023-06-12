@@ -2,11 +2,9 @@
 import Layout from "@/components/layout";
 import { Menu, Transition } from "@headlessui/react";
 import {
-  ArrowDown,
   ArrowDown2,
-  NoteRemove,
+  Moneys,
   Profile,
-  Stickynote,
 } from "iconsax-react";
 import dynamic from "next/dynamic";
 import { Fragment, useState } from "react";
@@ -73,18 +71,11 @@ export default function Home() {
           bgIconColor={"bg-orange-100"}
         />
         <CardInfo
-          Icon={Stickynote}
-          title={"jumlah hadir"}
+          Icon={Moneys}
+          title={"jumlah iuran"}
           total={35}
           iconColor={"text-green-400"}
           bgIconColor={"bg-green-100"}
-        />
-        <CardInfo
-          Icon={NoteRemove}
-          title={"jumlah tidak hadir"}
-          total={5}
-          iconColor={"text-red-400"}
-          bgIconColor={"bg-red-100"}
         />
       </div>
       {/* info */}
