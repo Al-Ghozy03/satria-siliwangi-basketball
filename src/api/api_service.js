@@ -21,6 +21,16 @@ class ApiService {
         .catch((er) => reject(er.response.data));
     });
   }
+  postWithDocument(endpoint, data) {
+    return new Promise((resolve, reject) => {
+      axios
+        .post(`${this.baseUrl}${endpoint}`, data, {
+          headers: { ...this.headers, "Content-Type": "multipart/formdata" },
+        })
+        .then((v) => resolve(v.data))
+        .catch((er) => reject(er.response.data));
+    });
+  }
   put(endpoint, data) {
     return new Promise((resolve, reject) => {
       axios
