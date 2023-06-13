@@ -3,7 +3,11 @@ import axios from "axios";
 class ApiService {
   constructor() {
     this.baseUrl = "http://localhost:4000";
-    this.headers = { authorization: `Bearer ${localStorage.getItem("token")}` };
+    this.headers = {
+      authorization: `Bearer ${
+        typeof window !== "undefined" ? localStorage.getItem("token") : null
+      }`,
+    };
   }
   get(endpoint) {
     return new Promise((resolve, reject) => {
@@ -34,9 +38,9 @@ class ApiService {
   put(endpoint, data) {
     return new Promise((resolve, reject) => {
       axios
-      .put(`${this.baseUrl}${endpoint}`, data, { headers: this.headers })
-      .then((v) => resolve(v.data))
-      .catch((er) => reject(er.response.data));
+        .put(`${this.baseUrl}${endpoint}`, data, { headers: this.headers })
+        .then((v) => resolve(v.data))
+        .catch((er) => reject(er.response.data));
     });
   }
   putWithDocument(endpoint, data) {
@@ -49,7 +53,7 @@ class ApiService {
         .catch((er) => reject(er.response.data));
     });
   }
-  
+
   delete(endpoint) {
     return new Promise((resolve, reject) => {
       axios
