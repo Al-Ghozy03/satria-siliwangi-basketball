@@ -1,5 +1,6 @@
 "use client";
 import api_service from "@/api/api_service";
+import { months } from "@/app/page";
 import Layout from "@/components/layout";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,7 +22,9 @@ const schema = yup
 
 export default function DetailOrangTua() {
   const { id } = useParams();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenSiswa, setIsOpenSiswa] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [selected, setSelected] = useState(null);
   const [data, setData] = useState({
     loading: false,
     error: false,
@@ -46,13 +49,18 @@ export default function DetailOrangTua() {
       name={"Orang Tua"}
       extra={
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={() => setIsOpenEdit(true)}
           className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
         >
           Edit
         </button>
       }
     >
+      <ModalDetail
+        isOpen={isOpenSiswa}
+        setIsOpen={setIsOpenSiswa}
+        data={selected}
+      />
       {data.loading ? (
         "Loading..."
       ) : !data.data ? (
@@ -61,8 +69,8 @@ export default function DetailOrangTua() {
         <div>
           <ModalEdit
             getData={getData}
-            isOpen={isOpen}
-            setIsOpen={setIsOpen}
+            isOpen={isOpenEdit}
+            setIsOpen={setIsOpenEdit}
             data={{
               nama_ayah: data.data?.nama_ayah,
               no_telepon_ayah: data.data?.no_telepon_ayah,
@@ -75,7 +83,12 @@ export default function DetailOrangTua() {
             <Info title={"Nama Ayah"} value={data.data?.nama_ayah} />
             <Info title={"Nama Ibu"} value={data.data?.nama_ibu} />
           </div>
-          <Info title={"Nama Siswa"} value={data.data?.siswa} />
+          <Info
+            title={"Nama Siswa"}
+            setIsOpen={setIsOpenSiswa}
+            setSelected={setSelected}
+            value={data.data?.siswa}
+          />
           <Info title={"Alamat"} value={data.data?.alamat} />
           <h3 className="text-gray-500 text-sm mt-2">Iuran Bulanan</h3>
           <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg lg:w-1/2 mt-2">
@@ -164,7 +177,7 @@ export default function DetailOrangTua() {
   );
 }
 
-function Info({ title, value }) {
+function Info({ title, value, setIsOpen, setSelected }) {
   return (
     <div className="mt-2">
       <h3 className="text-gray-500 text-sm">{title}</h3>
@@ -173,9 +186,16 @@ function Info({ title, value }) {
         (value?.length === 0
           ? "Siswa belum terdaftar"
           : value?.map((data, i) => (
-              <p key={i} className="font-medium">
-                {i + 1}. {data.nama}
-              </p>
+              <div key={i} className="font-medium">
+                <button
+                  onClick={() => {
+                    setSelected(data);
+                    setIsOpen(true);
+                  }}
+                >
+                  {i + 1}. {data.nama}
+                </button>
+              </div>
             )))}
     </div>
   );
@@ -308,5 +328,87 @@ function Input({ label, type, register, value, errors }) {
         </small>
       )}
     </div>
+  );
+}
+
+function ModalDetail({ isOpen, setIsOpen, data }) {
+  const date = new Date(data?.tanggal_lahir);
+
+  return (
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={() => setIsOpen(false)}
+      >
+        <Transition.Child
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </Transition.Child>
+
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <Transition.Child
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <div className="flex items-center space-x-4">
+                  <div
+                    style={{
+                      backgroundImage: `url(${process.env.BASE_URL}${data?.foto_siswa})`,
+                    }}
+                    className="h-24 w-24 rounded-full bg-gray-300 bg-cover bg-center"
+                  ></div>
+                  <div>
+                    <h1 className="text-lg font-semibold">{data?.nama}</h1>
+                    <p className="text-gray-400 text-sm">{data?.no_induk_ss}</p>
+                  </div>
+                </div>
+                <h1 className="text-lg font-semibold mt-2">
+                  Informasi Personal
+                </h1>
+                <div className="flex justify-between">
+                  <div>
+                    <Info title={"Nama"} value={data?.nama} />
+                    <Info title={"Jenis Kelamin"} value={data?.jenis_kelamin} />
+                    <Info title={"Asal Sekolah"} value={data?.sekolah} />
+                  </div>
+                  <div>
+                    <Info title={"NIS"} value={data?.no_induk_ss} />
+                    <Info
+                      title={"Tempat Tanggal Lahir"}
+                      value={`${data?.tempat_lahir}, ${date.getDate()} ${
+                        months[date.getMonth()]
+                      } ${date.getFullYear()}`}
+                    />
+                    <Info title={"Kelompok Umur"} value={data?.ku_genap} />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className="inline-flex justify-center rounded-md border mt-4 border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Close
+                </button>
+              </Dialog.Panel>
+            </Transition.Child>
+          </div>
+        </div>
+      </Dialog>
+    </Transition>
   );
 }
