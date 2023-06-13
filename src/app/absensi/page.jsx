@@ -22,10 +22,13 @@ export default function Absensi() {
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const options = ["hadir", "tidak hadir"];
   const [date, setDate] = useState(null);
-  const getData = async (date = null) => {
+  const [page, setPage] = useState(1);
+  const getData = async () => {
     try {
       setData({ loading: true, error: false, data: [] });
-      const res = await api_service.get(`/absensi?${date && `date=${date}`}`);
+      const res = await api_service.get(
+        `/absensi?${date && `date=${date}`}&page=${page}&limit=15`
+      );
       setData({ loading: false, error: false, data: res.data });
     } catch (er) {
       setData({ loading: false, error: true, data: [] });
@@ -33,7 +36,7 @@ export default function Absensi() {
   };
 
   useEffect(() => {
-    getData(date);
+    getData();
   }, [date]);
   return (
     <Layout
@@ -54,7 +57,12 @@ export default function Absensi() {
         </div>
       }
     >
-      <ModalCreate isOpen={isOpen} setIsOpen={setIsOpen} getData={getData} date={date} />
+      <ModalCreate
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        getData={getData}
+        date={date}
+      />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto h-full">
         {data.loading ? (
           "loading"
@@ -90,20 +98,15 @@ export default function Absensi() {
                     </td>
                     <td className="text-sm">{data.jam.substring(0, 5)}</td>
                     <td className="text-sm">
-                      <select
-                        defaultValue={data.status}
-                        className="outline-none capitalize w-44 lg:w-3/4 text-sm py-1.5 px-2 rounded-md appearance-none"
+                      <div
+                        className={`capitalize text-center text-white text-xs py-1.5 w-2/3 rounded-md ${
+                          data.status === "hadir"
+                            ? "bg-green-500"
+                            : "bg-red-600"
+                        }`}
                       >
-                        {options.map((v, j) => (
-                          <option
-                            key={j}
-                            className="text-sm capitalize"
-                            value={v}
-                          >
-                            {v}
-                          </option>
-                        ))}
-                      </select>
+                        {data.status}
+                      </div>
                     </td>
                   </tr>
                 );
@@ -111,13 +114,12 @@ export default function Absensi() {
             </tbody>
           </table>
         )}
-       
       </div>
     </Layout>
   );
 }
 
-function ModalCreate({ isOpen, setIsOpen, getData,date }) {
+function ModalCreate({ isOpen, setIsOpen, getData, date }) {
   const [selected, setSelected] = useState(null);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getList = async (q = "") => {

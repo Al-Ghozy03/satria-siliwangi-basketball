@@ -56,7 +56,7 @@ export default function Siswa() {
         total: data.total,
         current_page: data.current_page,
       });
-      const res = await api_service.get(`/siswa?page=${page}&limit=10`);
+      const res = await api_service.get(`/siswa?page=${page}&limit=15`);
       setData({
         loading: false,
         error: false,
@@ -152,16 +152,7 @@ export default function Siswa() {
                     {data.no_induk_ss ? data.no_induk_ss : "-"}
                   </td>
                   <td className="text-sm">
-                    <select
-                      defaultValue={data.ku_genap}
-                      className="outline-none w-44 lg:w-3/4 text-sm py-1.5 px-2 rounded-md appearance-none"
-                    >
-                      {options.map((v, j) => (
-                        <option key={j} className="text-sm" value={v}>
-                          {v}
-                        </option>
-                      ))}
-                    </select>
+                    <p>{data.ku_genap}</p>
                   </td>
                   <td className="text-sm">
                     <div className="flex space-x-3">
