@@ -8,6 +8,7 @@ import { Fragment, useEffect, useState } from "react";
 import api_service from "@/api/api_service";
 import { ArrowCircleDown, TickCircle } from "iconsax-react";
 import { months } from "../page";
+import ReactPaginate from "react-paginate";
 
 const schema = yup
   .object({
@@ -19,25 +20,52 @@ const schema = yup
 
 export default function Absensi() {
   const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState({ loading: false, error: false, data: [] });
-  const options = ["hadir", "tidak hadir"];
+  const [data, setData] = useState({
+    loading: false,
+    error: false,
+    data: [],
+    total: 0,
+    total_page: 0,
+    current_page: 1,
+  });
   const [date, setDate] = useState(null);
   const [page, setPage] = useState(1);
   const getData = async () => {
     try {
-      setData({ loading: true, error: false, data: [] });
+      setData({
+        loading: true,
+        error: false,
+        data: [],
+        total: data.total,
+        total_page: data.total_page,
+        current_page: data.current_page,
+      });
       const res = await api_service.get(
         `/absensi?${date && `date=${date}`}&page=${page}&limit=15`
       );
-      setData({ loading: false, error: false, data: res.data });
+      setData({
+        loading: false,
+        error: false,
+        data: res.data,
+        total: res.total,
+        total_page: res.total_page,
+        current_page: res.current_page,
+      });
     } catch (er) {
-      setData({ loading: false, error: true, data: [] });
+      setData({
+        loading: false,
+        error: true,
+        data: [],
+        total: data.total,
+        total_page: data.total_page,
+        current_page: data.current_page,
+      });
     }
   };
 
   useEffect(() => {
     getData();
-  }, [date]);
+  }, [date,page]);
   return (
     <Layout
       name={"Absensi"}
@@ -114,6 +142,30 @@ export default function Absensi() {
             </tbody>
           </table>
         )}
+        <ReactPaginate
+          containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
+          breakLabel="..."
+          activeClassName="bg-orange-500 shadow-lg text-white"
+          pageClassName="border border-orange-300 px-3 py-1.5 rounded-md"
+          nextLabel={
+            page !== data.total_page && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Next
+              </button>
+            )
+          }
+          onPageChange={({ selected }) => setPage(selected + 1)}
+          pageRangeDisplayed={3}
+          pageCount={data.total_page}
+          previousLabel={
+            page !== 1 && (
+              <button className="border border-orange-300 px-3 py-1.5 rounded-md">
+                Prev
+              </button>
+            )
+          }
+          renderOnZeroPageCount={null}
+        />
       </div>
     </Layout>
   );
