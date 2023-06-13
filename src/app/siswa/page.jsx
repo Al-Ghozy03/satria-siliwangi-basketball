@@ -10,20 +10,27 @@ import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ArrowDown2 } from "iconsax-react";
+import dotenv from "dotenv";
+dotenv.config();
 
-const schema = yup
-  .object({
-    no_induk_ss: yup.string().required(),
-    ku_genap: yup.string().required(),
-    jenis_kelamin: yup.string().required(),
-    tempat_lahir: yup.string().required(),
-    tanggal_lahir: yup.string().required(),
-    sekolah: yup.string().required(),
-    no_jersey: yup.string().required(),
-  })
-  .required();
-
+const schema = yup.object().shape({
+  no_induk_ss: yup.string().required(),
+  ku_genap: yup.string().required(),
+  jenis_kelamin: yup.string().required(),
+  tempat_lahir: yup.string().required(),
+  tanggal_lahir: yup.string().required(),
+  sekolah: yup.string().required(),
+  no_jersey: yup.string().required(),
+  foto_siswa: yup
+    .mixed()
+    .test("fileSize", "Maksimal 2 mb", (value) => {
+      if (!value) return true;
+      return value[0]?.size <= 2097152;
+    })
+    .notRequired(),
+});
 const options = ["KU 10 MIX", "KU 12", "KU 14", "KU 16", "Senior"];
+
 export default function Siswa() {
   const [data, setData] = useState({
     loading: false,
@@ -36,6 +43,7 @@ export default function Siswa() {
   const [selected, setSelected] = useState(null);
   const [isOpenDetail, setIsOpenDetail] = useState(false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
+  const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [totalPage, setTotalPage] = useState(0);
   const [isOpenCreate, setIsOpenCreate] = useState(false);
 
@@ -88,12 +96,19 @@ export default function Siswa() {
         </button>
       }
     >
+      <ModalEdit
+        getData={getData}
+        value={selected}
+        isOpen={isOpenEdit}
+        setIsOpen={setIsOpenEdit}
+        page={page}
+      />
       <ModalCreate
         getData={getData}
         isOpen={isOpenCreate}
         setIsOpen={setIsOpenCreate}
         page={page}
-        />
+      />
       <ModalDelete
         isOpen={isOpenDelete}
         page={page}
@@ -158,6 +173,15 @@ export default function Siswa() {
                         className="bg-blue-500 rounded-md p-1 text-white text-xs"
                       >
                         {/* <Edit className="h-4 w-4" /> */}Detail
+                      </button>
+                      <button
+                        onClick={() => {
+                          setSelected(data);
+                          setIsOpenEdit(true);
+                        }}
+                        className="bg-blue-500 rounded-md py-1 px-3 text-white text-xs"
+                      >
+                        {/* <Edit className="h-4 w-4" /> */}Edit
                       </button>
                       <button
                         onClick={() => {
@@ -239,7 +263,16 @@ function ModalDetail({ isOpen, setIsOpen, data }) {
             >
               <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <div className="flex items-center space-x-4">
-                  <div className="h-24 w-24 rounded-full bg-gray-300"></div>
+                  {!data?.foto_siswa ? (
+                    <div className="h-24 w-24 rounded-full bg-gray-300"></div>
+                  ) : (
+                    <div
+                      style={{
+                        backgroundImage: `url(${process.env.BASE_URL}${data?.foto_siswa})`,
+                      }}
+                      className="h-24 w-24 rounded-full bg-gray-300 bg-cover bg-center"
+                    ></div>
+                  )}
                   <div>
                     <h1 className="text-lg font-semibold">{data?.nama}</h1>
                     <p className="text-gray-400 text-sm">{data?.no_induk_ss}</p>
@@ -290,7 +323,7 @@ function Info({ title, value }) {
   );
 }
 
-function ModalDelete({ isOpen, setIsOpen, data, getData,page }) {
+function ModalDelete({ isOpen, setIsOpen, data, getData, page }) {
   const deleteData = async () => {
     try {
       await api_service.delete(`/siswa/delete/${data.id}`);
@@ -360,7 +393,7 @@ function ModalDelete({ isOpen, setIsOpen, data, getData,page }) {
     </Transition>
   );
 }
-function ModalEdit({ isOpen, setIsOpen, getData, page }) {
+function ModalEdit({ isOpen, setIsOpen, getData, page, value }) {
   const [selected, setSelected] = useState(null);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getList = async (q = "") => {
@@ -378,7 +411,6 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
     formState: { errors },
     reset,
   } = useForm({ resolver: yupResolver(schema) });
-
   const onSubmit = async (data) => {
     try {
       const formdata = new FormData();
@@ -391,8 +423,11 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
       formdata.append("tanggal_lahir", data.tanggal_lahir);
       formdata.append("sekolah", data.sekolah);
       formdata.append("no_jersey", data.no_jersey);
-      formdata.append("foto_siswa", data.foto_siswa[0]);
-      await api_service.post(`/siswa/add`, formdata);
+      formdata.append(
+        "foto_siswa",
+        !data.foto_siswa ? value?.foto_siswa : data.foto_siswa[0]
+      );
+      await api_service.putWithDocument(`/siswa/edit/${value?.id}`, formdata);
       getData(page);
       reset();
       setIsOpen(false);
@@ -400,6 +435,10 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
       console.log(er);
     }
   };
+  useEffect(() => {
+    reset();
+    setSelected(value?.orangtua);
+  }, [isOpen, reset]);
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog
@@ -435,19 +474,26 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
                   as="h3"
                   className="text-lg font-semibold leading-6"
                 >
-                  Tambah siswa
+                  Edit siswa
                 </Dialog.Title>
                 <form className="mt-2" onSubmit={handleSubmit(onSubmit)}>
                   <Input
                     label={"no_induk_ss"}
                     register={register}
                     errors={errors}
+                    value={value}
                   />
-                  <Input label={"nama"} register={register} errors={errors} />
+                  <Input
+                    label={"nama"}
+                    register={register}
+                    errors={errors}
+                    value={value}
+                  />
                   <Input
                     label={"tempat_lahir"}
                     register={register}
                     errors={errors}
+                    value={value}
                   />
                   <div className="grid gap-y-2 mt-2">
                     <label
@@ -546,7 +592,11 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
                     <div className="flex space-x-4">
                       <div className="flex items-center mb-4">
                         <input
-                          {...register("jenis_kelamin")}
+                          {...register("jenis_kelamin", {
+                            ...(value?.jenis_kelamin === "laki-laki" && {
+                              value: "laki-laki",
+                            }),
+                          })}
                           type="radio"
                           value="laki-laki"
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700"
@@ -555,7 +605,11 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
                       </div>
                       <div className="flex items-center mb-4">
                         <input
-                          {...register("jenis_kelamin")}
+                          {...register("jenis_kelamin", {
+                            ...(value?.jenis_kelamin === "perempuan" && {
+                              value: "perempuan",
+                            }),
+                          })}
                           type="radio"
                           value="perempuan"
                           className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:bg-gray-700"
@@ -565,22 +619,26 @@ function ModalEdit({ isOpen, setIsOpen, getData, page }) {
                     </div>
                   </div>
                   <Input
+                    value={value}
                     label={"tanggal_lahir"}
                     type={"date"}
                     register={register}
                     errors={errors}
                   />
                   <Input
+                    value={value}
                     label={"sekolah"}
                     register={register}
                     errors={errors}
                   />
                   <Input
+                    value={value}
                     label={"no_jersey"}
                     register={register}
                     errors={errors}
                   />
                   <Input
+                    value={value}
                     label={"foto_siswa"}
                     register={register}
                     errors={errors}
@@ -639,7 +697,7 @@ function ModalCreate({ isOpen, setIsOpen, getData, page }) {
       formdata.append("sekolah", data.sekolah);
       formdata.append("no_jersey", data.no_jersey);
       formdata.append("foto_siswa", data.foto_siswa[0]);
-      await api_service.post(`/siswa/add`, formdata);
+      await api_service.postWithDocument(`/siswa/add`, formdata);
       getData(page);
       reset();
       setIsOpen(false);
@@ -855,14 +913,16 @@ function ModalCreate({ isOpen, setIsOpen, getData, page }) {
   );
 }
 
-function Input({ label, type, register, errors }) {
+function Input({ label, type, register, errors, value }) {
   return (
     <div className="grid gap-y-2 mt-2">
       <label htmlFor={label} className="capitalize text-sm font-medium">
         {label.replaceAll("_", " ")}
       </label>
       <input
-        {...register(label)}
+        {...register(label, {
+          ...(value !== undefined && { value: value?.[label] }),
+        })}
         placeholder="Type here..."
         type={type}
         className="outline-none h-9 rounded text-sm border border-gray-300 pl-2 focus:ring-1 focus:ring-orange-400"

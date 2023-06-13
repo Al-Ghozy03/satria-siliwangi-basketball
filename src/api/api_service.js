@@ -34,11 +34,22 @@ class ApiService {
   put(endpoint, data) {
     return new Promise((resolve, reject) => {
       axios
-        .put(`${this.baseUrl}${endpoint}`, data, { headers: this.headers })
+      .put(`${this.baseUrl}${endpoint}`, data, { headers: this.headers })
+      .then((v) => resolve(v.data))
+      .catch((er) => reject(er.response.data));
+    });
+  }
+  putWithDocument(endpoint, data) {
+    return new Promise((resolve, reject) => {
+      axios
+        .put(`${this.baseUrl}${endpoint}`, data, {
+          headers: { ...this.headers, "Content-Type": "multipart/formdata" },
+        })
         .then((v) => resolve(v.data))
         .catch((er) => reject(er.response.data));
     });
   }
+  
   delete(endpoint) {
     return new Promise((resolve, reject) => {
       axios
