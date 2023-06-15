@@ -496,6 +496,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, page, value }) {
                     <select
                       {...register("ku_genap")}
                       className="outline-none w-full text-sm py-1.5 px-2 rounded-md appearance-none"
+                      defaultValue={value?.ku_genap}
                     >
                       {options.map((v, j) => (
                         <option key={j} className="text-sm" value={v}>
