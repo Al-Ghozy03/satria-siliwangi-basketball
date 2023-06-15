@@ -19,8 +19,8 @@ const schema = yup
 
 export default function IuranBulanan() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
-  const [isOpenCreate, setIsOpenCreate] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
+  const [isOpenCreate, setIsOpenCreate] = useState(false);
   const [selected, setSelected] = useState(null);
   const [data, setData] = useState({
     loading: false,
@@ -293,9 +293,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, data: value }) {
     }
   };
   useEffect(() => {
-    if (!isOpen) {
-      reset();
-    }
+    reset();
   }, [isOpen, reset]);
 
   return (
