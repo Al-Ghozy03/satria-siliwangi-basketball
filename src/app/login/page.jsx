@@ -4,9 +4,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import api_service from "@/api/api_service";
-import { useState } from "react";
-import { useRouter } from 'next/navigation';
-
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const schema = yup
   .object({
@@ -23,25 +22,29 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
   const [message, setMessage] = useState(null);
-  const router = useRouter()
+  const router = useRouter();
   const onSubmit = async (data) => {
     try {
       const res = await api_service.post("/admin/login", data);
       setMessage(null);
-      localStorage.setItem("token",res.data.token)
-      router.replace("/")
+      localStorage.setItem("token", res.data.token);
+      router.replace("/");
     } catch (er) {
       console.log(er);
       setMessage(er?.message);
     }
   };
 
+  useEffect(() => {
+    // window.location.reload();
+  }, [window]);
+
   return (
     <main
       style={{ backgroundImage: `url(${bg.src})` }}
       className="w-full h-screen bg-cover bg-bottom flex items-center"
     >
-      <div className="bg-white rounded-xl w-2/6 mx-auto p-5">
+      <div className="bg-white rounded-xl lg:w-2/6 mx-auto p-5">
         <h1 className="text-center text-xl font-semibold">Welcome</h1>
         <p className="text-gray-500 text-center text-xs">
           Please input your email and password

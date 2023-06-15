@@ -1,11 +1,24 @@
 "use client";
-import { Add, ClipboardText, Home2, Moneys, People, Profile } from "iconsax-react";
+import {
+  Add,
+  ClipboardText,
+  Home2,
+  Logout,
+  Moneys,
+  People,
+  Profile,
+} from "iconsax-react";
 import Image from "next/image";
 import logo from "../assets/SS-LOGO.png";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
-export default function SideBar({ open,setOpen }) {
+export default function SideBar({ open, setOpen }) {
+  const router = useRouter();
+  const logout = () => {
+    if (typeof window !== "undefined") localStorage.clear("token");
+    router.replace("/login");
+  };
   return (
     <nav
       className={`bg-white fixed h-full w-80 text-sm p-6 duration-150 lg:translate-x-0 ${
@@ -20,7 +33,10 @@ export default function SideBar({ open,setOpen }) {
           className="mb-5"
           priority
         />
-        <button onClick={()=>setOpen(close)} className="hover:bg-gray-200 p-2 rounded-full lg:hidden">
+        <button
+          onClick={() => setOpen(close)}
+          className="hover:bg-gray-200 p-2 rounded-full lg:hidden"
+        >
           <Add className="rotate-45" />
         </button>
       </div>
@@ -29,6 +45,10 @@ export default function SideBar({ open,setOpen }) {
       <Menu title={"siswa"} route={"/siswa"} Icon={Profile} />
       <Menu title={"absensi"} route={"/absensi"} Icon={ClipboardText} />
       <Menu title={"iuran bulanan"} route={"/iuran-bulanan"} Icon={Moneys} />
+      <button onClick={logout} className="flex space-x-2 capitalize px-2 py-3">
+        <Logout />
+        <p>Logout</p>
+      </button>
     </nav>
   );
 }
