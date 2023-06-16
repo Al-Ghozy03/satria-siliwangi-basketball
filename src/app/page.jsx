@@ -1,6 +1,7 @@
 "use client";
 import api_service from "@/api/api_service";
 import Layout from "@/components/layout";
+import { Icon } from "@iconify/react";
 import axios from "axios";
 import { Moneys, Profile } from "iconsax-react";
 import { useEffect, useState } from "react";
@@ -20,7 +21,7 @@ export const months = [
   "Desember",
 ];
 export default function Home() {
-  const date = new Date()
+  const date = new Date();
   const [info, setInfo] = useState({
     loading: false,
     error: false,
@@ -54,14 +55,26 @@ export default function Home() {
         <CardInfo
           Icon={Profile}
           title={"jumlah siswa"}
-          total={info?.total?.siswa}
+          total={
+            info.loading ? (
+              <Icon className="h-6 w-6 animate-spin" icon="mdi:loading" />
+            ) : (
+              info?.total?.siswa
+            )
+          }
           iconColor={"text-orange-400"}
           bgIconColor={"bg-orange-100"}
         />
         <CardInfo
           Icon={Moneys}
           title={`jumlah iuran bulan ${months[date.getMonth()]}`}
-          total={info?.total?.iuran}
+          total={
+            info.loading ? (
+              <Icon className="h-6 w-6 animate-spin" icon="mdi:loading" />
+            ) : (
+              info?.total?.iuran
+            )
+          }
           iconColor={"text-green-400"}
           bgIconColor={"bg-green-100"}
         />

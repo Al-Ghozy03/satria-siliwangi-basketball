@@ -4,6 +4,7 @@ import Layout from "@/components/layout";
 import Loading from "@/components/loading";
 import { Dialog, Transition } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Icon } from "@iconify/react";
 import { Edit, Trash } from "iconsax-react";
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
@@ -118,27 +119,27 @@ export default function OrangTua() {
           <tbody>
             {data.loading
               ? [...new Array(4).keys()].map((data, i) => (
-                <tr key={i}>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                  <td>
-                    <Loading className={"w-full h-6 rounded mt-2"} />
-                  </td>
-                </tr>
-              ))
+                  <tr key={i}>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                  </tr>
+                ))
               : data.data.length === 0
               ? "Empty"
               : data.data?.map((data, i) => (
@@ -209,12 +210,16 @@ export default function OrangTua() {
 }
 
 function ModalDelete({ isOpen, setIsOpen, data, getData }) {
+  const [isLoading, setIsLoading] = useState(false);
   const deleteData = async () => {
     try {
+      setIsLoading(true);
       await api_service.delete(`/orangtua/delete/${data.id}`);
       getData();
       setIsOpen(false);
+      setIsLoading(false);
     } catch (er) {
+      setIsLoading(false);
       console.log(er);
     }
   };
@@ -267,7 +272,14 @@ function ModalDelete({ isOpen, setIsOpen, data, getData }) {
                     onClick={deleteData}
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
-                    Yes
+                    {isLoading ? (
+                      <Icon
+                        className="animate-spin h-6 w-6"
+                        icon="mdi:loading"
+                      />
+                    ) : (
+                      "Yes"
+                    )}
                   </button>
                 </div>
               </Dialog.Panel>
@@ -286,15 +298,19 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
     formState: { errors },
     reset,
   } = useForm({ resolver: yupResolver(schema) });
+  const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true);
       await api_service.post(`/orangtua/add`, data);
       getData();
       reset();
       setIsOpen(false);
+      setIsLoading(false);
     } catch (er) {
       console.log(er);
+      setIsLoading(false);
     }
   };
   return (
@@ -365,7 +381,14 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading ? (
+                        <Icon
+                          className="animate-spin h-6 w-6"
+                          icon="mdi:loading"
+                        />
+                      ) : (
+                        "Submit"
+                      )}
                     </button>
                   </div>
                 </form>

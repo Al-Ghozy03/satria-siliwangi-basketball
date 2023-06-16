@@ -254,6 +254,7 @@ function Info({ title, value, setIsOpen, setSelected }) {
 }
 
 function ModalEdit({ data, isOpen, setIsOpen, getData }) {
+  const [isLoading, setIsLoading] = useState(false);
   const { id } = useParams();
   const {
     register,
@@ -264,11 +265,14 @@ function ModalEdit({ data, isOpen, setIsOpen, getData }) {
 
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true);
       await api_service.put(`/orangtua/edit/${id}`, data);
       getData();
       reset();
       setIsOpen(false);
+      setIsLoading(false);
     } catch (er) {
+      setIsLoading(false);
       console.log(er);
     }
   };
@@ -349,7 +353,7 @@ function ModalEdit({ data, isOpen, setIsOpen, getData }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading?<Icon className="animate-spin h-6 w-6" icon="mdi:loading" />:"Submit"}
                     </button>
                   </div>
                 </form>

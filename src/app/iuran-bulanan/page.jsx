@@ -10,6 +10,7 @@ import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 import { months } from "../page";
 import Loading from "@/components/loading";
+import { Icon } from "@iconify/react";
 
 const schema = yup
   .object({
@@ -216,12 +217,16 @@ export default function IuranBulanan() {
 }
 
 function ModalDelete({ isOpen, setIsOpen, data, getData }) {
+  const [isLoading, setIsLoading] = useState(false);
   const deleteData = async () => {
     try {
+      setIsLoading(true)
       await api_service.delete(`/iuran-bulanan/delete/${data.id}`);
       getData();
       setIsOpen(false);
+      setIsLoading(false)
     } catch (er) {
+      setIsLoading(false)
       console.log(er);
     }
   };
@@ -274,7 +279,7 @@ function ModalDelete({ isOpen, setIsOpen, data, getData }) {
                     onClick={deleteData}
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
-                    Yes
+                    {isLoading?<Icon className="animate-spin h-6 w-6" icon="mdi:loading" />:"Yes"}
                   </button>
                 </div>
               </Dialog.Panel>
@@ -287,6 +292,7 @@ function ModalDelete({ isOpen, setIsOpen, data, getData }) {
 }
 
 function ModalEdit({ isOpen, setIsOpen, getData, data: value }) {
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -296,11 +302,14 @@ function ModalEdit({ isOpen, setIsOpen, getData, data: value }) {
 
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true)
       await api_service.put(`/iuran-bulanan/edit/${value?.id}`, data);
       getData();
       reset();
       setIsOpen(false);
+      setIsLoading(false)
     } catch (er) {
+      setIsLoading(false)
       console.log(er);
     }
   };
@@ -389,7 +398,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, data: value }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading?<Icon className="animate-spin h-6 w-6" icon="mdi:loading" />:"Submit"}
                     </button>
                   </div>
                 </form>
@@ -402,6 +411,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, data: value }) {
   );
 }
 function ModalCreate({ isOpen, setIsOpen, getData }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedOrangtua, setSelectedOrangtua] = useState([]);
   const [selected, setSelected] = useState(null);
   const [value, setValue] = useState({
@@ -426,6 +436,7 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true)
       const final = [];
       for (let i = 0; i < selectedOrangtua.length; i++) {
         final.push({
@@ -438,7 +449,9 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
       getData();
       reset();
       setIsOpen(false);
+      setIsLoading(false)
     } catch (er) {
+      setIsLoading(false)
       console.log(er);
     }
   };
@@ -608,7 +621,7 @@ function ModalCreate({ isOpen, setIsOpen, getData }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading?<Icon className="animate-spin h-6 w-6" icon="mdi:loading" />:"Submit"}
                     </button>
                   </div>
                 </form>

@@ -10,6 +10,7 @@ import { ArrowDown2, TickCircle } from "iconsax-react";
 import { months } from "../page";
 import ReactPaginate from "react-paginate";
 import Loading from "@/components/loading";
+import { Icon } from "@iconify/react";
 
 const schema = yup
   .object({
@@ -235,6 +236,7 @@ export default function Absensi() {
 
 function ModalEdit({ isOpen, setIsOpen, getData, date, value }) {
   const [selected, setSelected] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getList = async (q = "") => {
     try {
@@ -253,6 +255,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, date, value }) {
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true);
       await api_service.put(`/absensi/edit/${value?.id}`, {
         ...data,
         id_siswa: selected.id,
@@ -260,7 +263,9 @@ function ModalEdit({ isOpen, setIsOpen, getData, date, value }) {
       getData(date);
       reset();
       setIsOpen(false);
+      setIsLoading(false);
     } catch (er) {
+      setIsLoading(false);
       console.log(er);
     }
   };
@@ -416,7 +421,14 @@ function ModalEdit({ isOpen, setIsOpen, getData, date, value }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading ? (
+                        <Icon
+                          className="animate-spin h-6 w-6"
+                          icon="mdi:loading"
+                        />
+                      ) : (
+                        "Submit"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -429,6 +441,7 @@ function ModalEdit({ isOpen, setIsOpen, getData, date, value }) {
   );
 }
 function ModalCreate({ isOpen, setIsOpen, getData, date }) {
+  const [isLoading, setIsLoading] = useState(false);
   const [selected, setSelected] = useState(null);
   const [data, setData] = useState({ loading: false, error: false, data: [] });
   const getList = async (q = "") => {
@@ -448,6 +461,7 @@ function ModalCreate({ isOpen, setIsOpen, getData, date }) {
   } = useForm({ resolver: yupResolver(schema) });
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true);
       await api_service.post(`/absensi/create`, {
         ...data,
         id_siswa: selected.id,
@@ -455,7 +469,9 @@ function ModalCreate({ isOpen, setIsOpen, getData, date }) {
       getData(date);
       reset();
       setIsOpen(false);
+      setIsLoading(false);
     } catch (er) {
+      setIsLoading(false);
       console.log(er);
     }
   };
@@ -605,7 +621,14 @@ function ModalCreate({ isOpen, setIsOpen, getData, date }) {
                       Cancel
                     </button>
                     <button className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2">
-                      Submit
+                      {isLoading ? (
+                        <Icon
+                          className="animate-spin h-6 w-6"
+                          icon="mdi:loading"
+                        />
+                      ) : (
+                        "Submit"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -618,12 +641,16 @@ function ModalCreate({ isOpen, setIsOpen, getData, date }) {
   );
 }
 function ModalDelete({ isOpen, setIsOpen, data, getData }) {
+  const [isLoading, setIsLoading] = useState(false);
   const deleteData = async () => {
     try {
+      setIsLoading(true)
       await api_service.delete(`/absensi/delete/${data.id}`);
       getData();
       setIsOpen(false);
+      setIsLoading(false)
     } catch (er) {
+      setIsLoading(false)
       console.log(er);
     }
   };
@@ -676,7 +703,7 @@ function ModalDelete({ isOpen, setIsOpen, data, getData }) {
                     onClick={deleteData}
                     className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                   >
-                    Yes
+                    {isLoading?<Icon className="animate-spin h-6 w-6" icon="mdi:loading" />:"Yes"}
                   </button>
                 </div>
               </Dialog.Panel>

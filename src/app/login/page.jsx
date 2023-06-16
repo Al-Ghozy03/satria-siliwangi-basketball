@@ -6,6 +6,7 @@ import * as yup from "yup";
 import api_service from "@/api/api_service";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Icon } from "@iconify/react";
 
 const schema = yup
   .object({
@@ -22,22 +23,24 @@ export default function Login() {
     resolver: yupResolver(schema),
   });
   const [message, setMessage] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const onSubmit = async (data) => {
     try {
+      setIsLoading(true)
       const res = await api_service.post("/admin/login", data);
       setMessage(null);
       localStorage.setItem("token", res.data.token);
+      setIsLoading(false)
       router.replace("/");
+      // window.location.reload()
     } catch (er) {
       console.log(er);
+      setIsLoading(false)
       setMessage(er?.message);
     }
   };
 
-  useEffect(() => {
-    // window.location.reload();
-  }, [window]);
 
   return (
     <main
@@ -84,7 +87,7 @@ export default function Login() {
             error={errors.password?.message}
           />
           <button className="bg-[#F3A822] text-sm text-white font-semibold w-full py-2 mt-2 rounded-md">
-            Login
+            {isLoading?<Icon className="animate-spin h-6 w-6 mx-auto" icon="mdi:loading" />:"Login"}
           </button>
         </form>
       </div>
