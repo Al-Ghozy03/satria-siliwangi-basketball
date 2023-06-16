@@ -46,6 +46,7 @@ export default function Siswa() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [totalPage, setTotalPage] = useState(0);
+  const [q, setQ] = useState("");
   const [isOpenCreate, setIsOpenCreate] = useState(false);
 
   const getData = async (page) => {
@@ -57,7 +58,7 @@ export default function Siswa() {
         total: data.total,
         current_page: data.current_page,
       });
-      const res = await api_service.get(`/siswa?page=${page}&limit=15`);
+      const res = await api_service.get(`/siswa?page=${page}&limit=15&q=${q}`);
       setData({
         loading: false,
         error: false,
@@ -83,18 +84,26 @@ export default function Siswa() {
 
   useEffect(() => {
     getData(page);
-  }, [page]);
+  }, [page, q]);
 
   return (
     <Layout
       name={"Siswa"}
       extra={
-        <button
-          onClick={() => setIsOpenCreate(true)}
-          className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
-        >
-          Add
-        </button>
+        <div className="lg:flex lg:space-x-3">
+          <input
+            onChange={(e) => setQ(e.target.value)}
+            type="text"
+            className="outline-none h-8 rounded text-sm border border-gray-300 pl-2 focus:ring-1 focus:ring-orange-400"
+            placeholder="Search..."
+          />
+          <button
+            onClick={() => setIsOpenCreate(true)}
+            className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
+          >
+            Add
+          </button>
+        </div>
       }
     >
       <ModalEdit
