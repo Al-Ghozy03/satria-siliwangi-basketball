@@ -11,6 +11,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { ArrowDown2 } from "iconsax-react";
 import dotenv from "dotenv";
+import Loading from "@/components/loading";
 dotenv.config();
 
 const schema = yup.object().shape({
@@ -122,74 +123,90 @@ export default function Siswa() {
         data={selected}
       />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto h-full">
-        {data.loading ? (
-          <Icon icon="mdi:loading" className="h-10 w-10 animate-spin mx-auto" />
-        ) : (
-          <table className="w-full table-auto">
-            <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
-              <tr>
-                <th className="font-semibold text-[#969696] text-sm ">No</th>
-                <th className="font-semibold text-[#969696] text-sm w-60 text-left">
-                  Nama
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  NIS
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Kelompok Umur
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data?.map((data, i) => (
-                <tr key={i}>
-                  <td className="text-sm text-center">{i + 1}</td>
-                  <td className="text-sm">{data.nama ? data.nama : "-"}</td>
-                  <td className="text-sm">
-                    {data.no_induk_ss ? data.no_induk_ss : "-"}
-                  </td>
-                  <td className="text-sm">
-                    <p>{data.ku_genap}</p>
-                  </td>
-                  <td className="text-sm">
-                    <div className="flex space-x-3">
-                      <button
-                        onClick={() => {
-                          setSelected(data);
-                          setIsOpenDetail(true);
-                        }}
-                        className="bg-blue-500 rounded-md p-1 text-white text-xs"
-                      >
-                        {/* <Edit className="h-4 w-4" /> */}Detail
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelected(data);
-                          setIsOpenEdit(true);
-                        }}
-                        className="bg-blue-500 rounded-md py-1 px-3 text-white text-xs"
-                      >
-                        {/* <Edit className="h-4 w-4" /> */}Edit
-                      </button>
-                      <button
-                        onClick={() => {
-                          setSelected(data);
-                          setIsOpenDelete(true);
-                        }}
-                        className="bg-red-500 rounded-md p-1 text-white text-xs"
-                      >
-                        {/* <Trash className="h-4 w-4" /> */} Hapus
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+        <table className="w-full table-auto">
+          <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
+            <tr>
+              <th className="font-semibold text-[#969696] text-sm ">No</th>
+              <th className="font-semibold text-[#969696] text-sm w-60 text-left">
+                Nama
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                NIS
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Kelompok Umur
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.loading
+              ? [...new Array(4).keys()].map((data, i) => (
+                  <tr key={i}>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                  </tr>
+                ))
+              : data.data?.map((data, i) => (
+                  <tr key={i}>
+                    <td className="text-sm text-center">{i + 1}</td>
+                    <td className="text-sm">{data.nama ? data.nama : "-"}</td>
+                    <td className="text-sm">
+                      {data.no_induk_ss ? data.no_induk_ss : "-"}
+                    </td>
+                    <td className="text-sm">
+                      <p>{data.ku_genap}</p>
+                    </td>
+                    <td className="text-sm">
+                      <div className="flex space-x-3">
+                        <button
+                          onClick={() => {
+                            setSelected(data);
+                            setIsOpenDetail(true);
+                          }}
+                          className="bg-blue-500 rounded-md p-1 text-white text-xs"
+                        >
+                          {/* <Edit className="h-4 w-4" /> */}Detail
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelected(data);
+                            setIsOpenEdit(true);
+                          }}
+                          className="bg-blue-500 rounded-md py-1 px-3 text-white text-xs"
+                        >
+                          {/* <Edit className="h-4 w-4" /> */}Edit
+                        </button>
+                        <button
+                          onClick={() => {
+                            setSelected(data);
+                            setIsOpenDelete(true);
+                          }}
+                          className="bg-red-500 rounded-md p-1 text-white text-xs"
+                        >
+                          {/* <Trash className="h-4 w-4" /> */} Hapus
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+          </tbody>
+        </table>
         <ReactPaginate
           containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
           breakLabel="..."

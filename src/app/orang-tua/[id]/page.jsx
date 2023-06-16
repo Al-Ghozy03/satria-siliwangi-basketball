@@ -119,7 +119,7 @@ export default function DetailOrangTua() {
         setIsOpen={setIsOpenSiswa}
         data={selected}
       />
-      {!data.loading ? (
+      {data.loading ? (
         <div className="flex justify-center h-96 flex-col items-center">
           <Icon className="h-12 w-12 animate-spin" icon="mdi:loading" />
         </div>

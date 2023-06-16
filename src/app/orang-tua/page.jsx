@@ -1,6 +1,7 @@
 "use client";
 import api_service from "@/api/api_service";
 import Layout from "@/components/layout";
+import Loading from "@/components/loading";
 import { Dialog, Transition } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Edit, Trash } from "iconsax-react";
@@ -116,7 +117,28 @@ export default function OrangTua() {
           </thead>
           <tbody>
             {data.loading
-              ? "Loading..."
+              ? [...new Array(4).keys()].map((data, i) => (
+                <tr key={i}>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                  <td>
+                    <Loading className={"w-full h-6 rounded mt-2"} />
+                  </td>
+                </tr>
+              ))
               : data.data.length === 0
               ? "Empty"
               : data.data?.map((data, i) => (

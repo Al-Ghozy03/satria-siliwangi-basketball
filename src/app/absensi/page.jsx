@@ -9,6 +9,7 @@ import api_service from "@/api/api_service";
 import { ArrowDown2, TickCircle } from "iconsax-react";
 import { months } from "../page";
 import ReactPaginate from "react-paginate";
+import Loading from "@/components/loading";
 
 const schema = yup
   .object({
@@ -109,81 +110,100 @@ export default function Absensi() {
         date={date}
       />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto h-full">
-        {data.loading ? (
-          "loading"
-        ) : (
-          <table className="w-full table-auto">
-            <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
-              <tr>
-                <th className="font-semibold text-[#969696] text-sm ">No</th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Nama
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Tanggal
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Jam
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Status
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data?.map((data, i) => {
-                const date = new Date(data.tanggal);
-                return (
+        <table className="w-full table-auto">
+          <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
+            <tr>
+              <th className="font-semibold text-[#969696] text-sm ">No</th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Nama
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Tanggal
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Jam
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Status
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.loading
+              ? [...new Array(4).keys()].map((data, i) => (
                   <tr key={i}>
-                    <td className="text-sm text-center">{i + 1}</td>
-                    <td className="text-sm">{data.siswa?.nama}</td>
-                    <td className="text-sm">
-                      {date.getDate()} {months[date.getMonth()]}{" "}
-                      {date.getFullYear()}
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
-                    <td className="text-sm">{data.jam.substring(0, 5)}</td>
-                    <td className="text-sm">
-                      <div
-                        className={`capitalize text-center text-white text-xs py-1.5 w-2/3 rounded-md ${
-                          data.status === "hadir"
-                            ? "bg-green-500"
-                            : "bg-red-600"
-                        }`}
-                      >
-                        {data.status}
-                      </div>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
-                    <td className="text-sm">
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => {
-                            setIsOpenEdit(true);
-                            setSelected(data);
-                          }}
-                          className="bg-blue-500 rounded-md p-1 text-white text-xs"
-                        >
-                          {/* <Edit className="h-4 w-4" /> */}Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsOpenDelete(true);
-                            setSelected(data);
-                          }}
-                          className="bg-red-500 rounded-md p-1 text-white text-xs"
-                        >
-                          {/* <Trash className="h-4 w-4" /> */} Hapus
-                        </button>
-                      </div>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
+                    </td>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+                ))
+              : data.data?.map((data, i) => {
+                  const date = new Date(data.tanggal);
+                  return (
+                    <tr key={i}>
+                      <td className="text-sm text-center">{i + 1}</td>
+                      <td className="text-sm">{data.siswa?.nama}</td>
+                      <td className="text-sm">
+                        {date.getDate()} {months[date.getMonth()]}{" "}
+                        {date.getFullYear()}
+                      </td>
+                      <td className="text-sm">{data.jam.substring(0, 5)}</td>
+                      <td className="text-sm">
+                        <div
+                          className={`capitalize text-center text-white text-xs py-1.5 w-2/3 rounded-md ${
+                            data.status === "hadir"
+                              ? "bg-green-500"
+                              : "bg-red-600"
+                          }`}
+                        >
+                          {data.status}
+                        </div>
+                      </td>
+                      <td className="text-sm">
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => {
+                              setIsOpenEdit(true);
+                              setSelected(data);
+                            }}
+                            className="bg-blue-500 rounded-md p-1 text-white text-xs"
+                          >
+                            {/* <Edit className="h-4 w-4" /> */}Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsOpenDelete(true);
+                              setSelected(data);
+                            }}
+                            className="bg-red-500 rounded-md p-1 text-white text-xs"
+                          >
+                            {/* <Trash className="h-4 w-4" /> */} Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+          </tbody>
+        </table>
         <ReactPaginate
           containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
           breakLabel="..."

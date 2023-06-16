@@ -9,6 +9,7 @@ import { useForm } from "react-hook-form";
 import ReactPaginate from "react-paginate";
 import * as yup from "yup";
 import { months } from "../page";
+import Loading from "@/components/loading";
 
 const schema = yup
   .object({
@@ -95,85 +96,96 @@ export default function IuranBulanan() {
         getData={getData}
       />
       <div className="shadow-xl shadow-gray-200 bg-white py-5 px-3 rounded-lg overflow-x-auto">
-        {data.loading ? (
-          "Loading..."
-        ) : data.data.length === 0 ? (
-          "Empty"
-        ) : (
-          <table className="w-full">
-            <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
-              <tr>
-                <th className="font-semibold text-[#969696] text-sm w-1/4 lg:w-auto">
-                  No
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-60">
-                  Nama Ayah
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left">
-                  Status
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-auto">
-                  Tanggal Pembayaran
-                </th>
-                <th className="font-semibold text-[#969696] text-sm text-center lg:text-left w-96 lg:w-auto">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.data?.map((data, i) => {
-                const date = new Date(data?.tanggal_pembayaran);
-                return (
+        <table className="w-full">
+          <thead className="border border-b-[1.5px] border-l-0 border-r-0 border-t-0 mb-2">
+            <tr>
+              <th className="font-semibold text-[#969696] text-sm w-1/4 lg:w-auto">
+                No
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-60">
+                Nama Ayah
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left">
+                Status
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-left w-full lg:w-auto">
+                Tanggal Pembayaran
+              </th>
+              <th className="font-semibold text-[#969696] text-sm text-center lg:text-left w-96 lg:w-auto">
+                Action
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.loading
+              ? [...new Array(4).keys()].map((data, i) => (
                   <tr key={i}>
-                    <td className="text-sm text-center">{i + 1}</td>
-                    <td className="text-sm">
-                      {data?.orangtua?.nama_ayah
-                        ? data?.orangtua?.nama_ayah
-                        : "-"}
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
-                    <td className="text-sm">
-                      <div
-                        className={`${
-                          data.status === "terbayar"
-                            ? "bg-green-500"
-                            : "bg-red-500"
-                        } text-center text-white capitalize py-1 rounded-lg w-2/3 text-sm`}
-                      >
-                        {data.status}
-                      </div>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
-                    <td className="text-sm">
-                      {date.getDate()} {months[date.getMonth()]}{" "}
-                      {date.getFullYear()}
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
-                    <td className="text-sm">
-                      <div className="flex space-x-3">
-                        <button
-                          onClick={() => {
-                            setIsOpenEdit(true);
-                            setSelected(data);
-                          }}
-                          className="bg-blue-500 rounded-md p-1 text-white text-xs"
-                        >
-                          {/* <Edit className="h-4 w-4" /> */}Edit
-                        </button>
-                        <button
-                          onClick={() => {
-                            setIsOpenDelete(true);
-                            setSelected(data);
-                          }}
-                          className="bg-red-500 rounded-md p-1 text-white text-xs"
-                        >
-                          {/* <Trash className="h-4 w-4" /> */} Hapus
-                        </button>
-                      </div>
+                    <td>
+                      <Loading className={"w-full h-6 rounded mt-2"} />
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
+                ))
+              : data.data?.map((data, i) => {
+                  const date = new Date(data?.tanggal_pembayaran);
+                  return (
+                    <tr key={i}>
+                      <td className="text-sm text-center">{i + 1}</td>
+                      <td className="text-sm">
+                        {data?.orangtua?.nama_ayah
+                          ? data?.orangtua?.nama_ayah
+                          : "-"}
+                      </td>
+                      <td className="text-sm">
+                        <div
+                          className={`${
+                            data.status === "terbayar"
+                              ? "bg-green-500"
+                              : "bg-red-500"
+                          } text-center text-white capitalize py-1 rounded-lg w-2/3 text-sm`}
+                        >
+                          {data.status}
+                        </div>
+                      </td>
+                      <td className="text-sm">
+                        {date.getDate()} {months[date.getMonth()]}{" "}
+                        {date.getFullYear()}
+                      </td>
+                      <td className="text-sm">
+                        <div className="flex space-x-3">
+                          <button
+                            onClick={() => {
+                              setIsOpenEdit(true);
+                              setSelected(data);
+                            }}
+                            className="bg-blue-500 rounded-md p-1 text-white text-xs"
+                          >
+                            {/* <Edit className="h-4 w-4" /> */}Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setIsOpenDelete(true);
+                              setSelected(data);
+                            }}
+                            className="bg-red-500 rounded-md p-1 text-white text-xs"
+                          >
+                            {/* <Trash className="h-4 w-4" /> */} Hapus
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+          </tbody>
+        </table>
         <ReactPaginate
           containerClassName="flex space-x-3 text-xs justify-center mt-5 items-center"
           breakLabel="..."
