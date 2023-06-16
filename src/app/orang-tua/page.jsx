@@ -26,6 +26,7 @@ export default function OrangTua() {
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const [isOpenCreate, setIsOpenCreate] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [q, setQ] = useState("");
   const [data, setData] = useState({
     loading: false,
     error: false,
@@ -45,7 +46,9 @@ export default function OrangTua() {
         total_page: data.total_page,
         current_page: data.current_page,
       });
-      const res = await api_service.get(`/orangtua?limit=15&page=${page}`);
+      const res = await api_service.get(
+        `/orangtua?limit=15&page=${page}&q=${q}`
+      );
       setData({
         error: false,
         loading: false,
@@ -68,17 +71,25 @@ export default function OrangTua() {
   };
   useEffect(() => {
     getData();
-  }, [page]);
+  }, [page, q]);
   return (
     <Layout
       name={"Orang tua"}
       extra={
-        <button
-          onClick={() => setIsOpenCreate(true)}
-          className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
-        >
-          Add
-        </button>
+        <div className="lg:flex lg:space-x-3">
+          <input
+            onChange={(e) => setQ(e.target.value)}
+            type="text"
+            className="outline-none h-8 rounded text-sm border border-gray-300 pl-2 focus:ring-1 focus:ring-orange-400"
+            placeholder="Search..."
+          />
+          <button
+            onClick={() => setIsOpenCreate(true)}
+            className="text-sm bg-[#FFE3B1] px-4 py-1 rounded-md font-semibold text-orange-500"
+          >
+            Add
+          </button>
+        </div>
       }
     >
       <ModalCreate
