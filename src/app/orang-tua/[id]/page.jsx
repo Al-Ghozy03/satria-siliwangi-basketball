@@ -2,9 +2,10 @@
 import api_service from "@/api/api_service";
 import { months } from "@/app/page";
 import Layout from "@/components/layout";
-import { Dialog, Menu, Transition } from "@headlessui/react";
+import Loading from "@/components/loading";
+import { Dialog, Transition } from "@headlessui/react";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { ArrowDown2 } from "iconsax-react";
+import { Icon } from "@iconify/react";
 import { useParams } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -25,12 +26,55 @@ export default function DetailOrangTua() {
   const [isOpenSiswa, setIsOpenSiswa] = useState(false);
   const [isOpenEdit, setIsOpenEdit] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [page, setPage] = useState(1);
+
   const [data, setData] = useState({
     loading: false,
     error: false,
     data: null,
   });
+  const [iuran, setIuran] = useState({
+    loading: false,
+    error: false,
+    data: [],
+    total: 0,
+    total_page: 0,
+    current_page: 1,
+  });
 
+  const getIuran = async () => {
+    try {
+      setIuran({
+        error: false,
+        loading: true,
+        data: [],
+        total: iuran.total,
+        total_page: iuran.total_page,
+        current_page: iuran.current_page,
+      });
+      const res = await api_service.get(
+        `/iuran-bulanan?id=${id}&limit=15&page=${page}`
+      );
+      setIuran({
+        error: false,
+        loading: false,
+        data: res.data,
+        total: iuran.total,
+        total_page: iuran.total_page,
+        current_page: iuran.current_page,
+      });
+    } catch (er) {
+      console.log(er);
+      setIuran({
+        error: true,
+        loading: false,
+        data: [],
+        total: iuran.total,
+        total_page: iuran.total_page,
+        current_page: iuran.current_page,
+      });
+    }
+  };
   const getData = async () => {
     try {
       setData({ loading: true, error: false, data: null });
@@ -41,9 +85,23 @@ export default function DetailOrangTua() {
       setData({ loading: false, error: true, data: null });
     }
   };
+  const changeStatus = async (e, id) => {
+    try {
+      await api_service.put(`/iuran-bulanan/edit/${id}`, {
+        status: e.target.value,
+      });
+      getIuran();
+    } catch (er) {
+      console.log(er);
+    }
+  };
   useEffect(() => {
     getData();
   }, []);
+  useEffect(() => {
+    getIuran();
+  }, [page]);
+
   return (
     <Layout
       name={"Orang Tua"}
@@ -61,8 +119,10 @@ export default function DetailOrangTua() {
         setIsOpen={setIsOpenSiswa}
         data={selected}
       />
-      {data.loading ? (
-        "Loading..."
+      {!data.loading ? (
+        <div className="flex justify-center h-96 flex-col items-center">
+          <Icon className="h-12 w-12 animate-spin" icon="mdi:loading" />
+        </div>
       ) : !data.data ? (
         "Orangtua tidak ditemukan"
       ) : (
@@ -107,67 +167,59 @@ export default function DetailOrangTua() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td className="text-sm">Januari</td>
-                  <td className="text-sm">
-                    <div className="bg-red-500 text-white text-center text-xs rounded-lg py-1.5 w-32">
-                      Belum Terbayar
-                    </div>
-                  </td>
-                  <td className="text-sm">
-                    <Menu
-                      as="div"
-                      className="relative inline-block text-left bg-white z-40 text-xs"
-                    >
-                      <div>
-                        <Menu.Button className="inline-flex w-full justify-center rounded-md px-4 py-2 text-xs font-medium">
-                          Pilih
-                          <ArrowDown2 className="h-4 w-4 ml-2" />
-                        </Menu.Button>
-                      </div>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <div className="px-1 py-1 ">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <button
-                                  className={`${
-                                    active
-                                      ? "bg-violet-500 text-white"
-                                      : "text-gray-900"
-                                  } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
-                                >
-                                  Terbayar
-                                </button>
-                              )}
-                            </Menu.Item>
-                            <Menu.Item>
-                              {({ active }) => (
-                                <button
-                                  className={`${
-                                    active
-                                      ? "bg-violet-500 text-white"
-                                      : "text-gray-900"
-                                  } group flex w-full items-center rounded-md px-2 py-2 text-xs`}
-                                >
-                                  Belum Terbayar
-                                </button>
-                              )}
-                            </Menu.Item>
-                          </div>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
-                  </td>
-                </tr>
+                {iuran.loading
+                  ? [...new Array(4).keys()].map((data, i) => (
+                      <tr key={i}>
+                        <td>
+                          <Loading className={"w-full h-6 rounded mt-2"} />
+                        </td>
+                        <td>
+                          <Loading className={"w-full h-6 rounded mt-2"} />
+                        </td>
+                        <td>
+                          <Loading className={"w-full h-6 rounded mt-2"} />
+                        </td>
+                      </tr>
+                    ))
+                  : iuran.data?.map((data, i) => {
+                      const date = new Date(data.tanggal_pembayaran);
+                      return (
+                        <tr key={i}>
+                          <td className="text-sm">{months[date.getMonth()]}</td>
+                          <td className="text-sm">
+                            <div
+                              className={`${
+                                data.status === "terbayar"
+                                  ? "bg-green-500"
+                                  : "bg-red-500"
+                              } capitalize text-white text-center text-xs rounded-lg py-1.5 w-32`}
+                            >
+                              {data.status}
+                            </div>
+                          </td>
+                          <td>
+                            <select
+                              onChange={(e) => changeStatus(e, data.id)}
+                              defaultValue={data.status}
+                              className="text-sm capitalize h-9 outline-none rounded-md"
+                            >
+                              <option
+                                value="belum terbayar"
+                                className="capitalize text-sm"
+                              >
+                                belum terbayar
+                              </option>
+                              <option
+                                value="terbayar"
+                                className="capitalize text-sm"
+                              >
+                                terbayar
+                              </option>
+                            </select>
+                          </td>
+                        </tr>
+                      );
+                    })}
               </tbody>
             </table>
           </div>
